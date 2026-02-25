@@ -12,6 +12,19 @@ designed using localmaze gui creator
 -- Instances: 54 | Scripts: 15 | Modules: 0 | Tags: 0
 local LMG2L = {};
 
+function randomString()
+	local length = math.random(10,20)
+	local array = {}
+	for i = 1, length do
+		array[i] = string.char(math.random(32, 126))
+	end
+	return table.concat(array)
+end
+
+local folder = Instance.new("Folder")
+folder.Parent = game.CoreGui
+folder.Name = randomString()
+
 -- Players.9x7x9x4x6.PlayerGui.ScreenGui
 LMG2L["ScreenGui_1"] = Instance.new("ScreenGui", game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"));
 LMG2L["ScreenGui_1"]["ZIndexBehavior"] = Enum.ZIndexBehavior.Sibling;
@@ -442,6 +455,7 @@ LMG2L["UIAspectRatioConstraint_36"]["AspectRatio"] = 0.73355;
 local gui = LMG2L["ScreenGui_1"]
 
 gui.ResetOnSpawn = false
+gui.Parent = folder
 
 -- Players.9x7x9x4x6.PlayerGui.ScreenGui.Frame.TextButton.LocalScript
 local function C_8()
