@@ -851,7 +851,7 @@ task.spawn(C_e);
 -- Players.9x7x9x4x6.PlayerGui.ScreenGui.Frame.TextButton.LocalScript
 local function C_11()
 	local script = LMG2L["LocalScript_11"];
-	name.MouseButton1Click:Connect(function() -- Replace with your instance name
+	script.parent.MouseButton1Click:Connect(function() -- Replace with your instance name
 		local player = game.Players.LocalPlayer
 		local char = player.Character
 		local tool
@@ -1913,9 +1913,9 @@ task.spawn(C_17);
 local function C_1a()
 	local script = LMG2L["LocalScript_1a"];
 	script.parent.MouseButton1Click:Connect(function() -- Replace with your instance name
-	local ReplicatedStorage = game:GetService("ReplicatedStorage")
-	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
-	RequestCommand:InvokeServer(";r6 me")
+	 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommandSilent
+	RequestCommand:InvokeServer(";r6")
     end)
 
 end;
@@ -1923,10 +1923,10 @@ task.spawn(C_1a);
 -- Players.9x7x9x4x6.PlayerGui.ScreenGui.Frame.TextButton.LocalScript
 local function C_1d()
 	local script = LMG2L["LocalScript_1d"];
-	ButtonName.MouseButton1Click:Connect(function() -- Replace with your instance name
-	local ReplicatedStorage = game:GetService("ReplicatedStorage")
-	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
-	RequestCommand:InvokeServer(";btools")
+	script.parent.MouseButton1Click:Connect(function() -- Replace with your instance name
+	 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommandSilent
+	RequestCommand:InvokeServer(";btools me")
     end)
 
 end;
@@ -2807,9 +2807,9 @@ task.spawn(C_29);
 local function C_2d()
 	local script = LMG2L["LocalScript_2d"];
 	script.parent.MouseButton1Down:connect(function()
-    local ReplicatedStorage = game:GetService("ReplicatedStorage")
-	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
-	RequestCommand:InvokeServer(";music 70463237028195 ;volume inf /pitch 0.1")
+     local ReplicatedStorage = game:GetService("ReplicatedStorage")
+	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommandSilent
+	RequestCommand:InvokeServer(";music 70463237028195 ;volume inf ;pitch inf")
     end)
 end;
 task.spawn(C_2d);
@@ -2817,9 +2817,9 @@ task.spawn(C_2d);
 local function C_30()
 	local script = LMG2L["LocalScript_30"];
 	script.parent.MouseButton1Down:connect(function()
-    local ReplicatedStorage = game:GetService("ReplicatedStorage")
-	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
-	RequestCommand:InvokeServer(";music 119793287768463 ;volume inf /pitch 0.1")
+     local ReplicatedStorage = game:GetService("ReplicatedStorage")
+	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommandSilent
+	RequestCommand:InvokeServer(";music 119793287768463 ;pitch 0.1 ;volume inf")
     end)
 end;
 task.spawn(C_30);
