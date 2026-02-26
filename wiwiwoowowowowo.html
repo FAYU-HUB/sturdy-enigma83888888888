@@ -1548,129 +1548,73 @@ end;
 task.spawn(C_17);
 -- Players.9x7x9x4x6.PlayerGui.ScreenGui.Frame.TextButton.LocalScript
 local function C_1a()
-	local script = LMG2L["LocalScript_1a"];
-	script.parent.MouseButton1Down:Connect(function()
-			local player = game.Players.LocalPlayer
-			local char = player.Character or player.CharacterAdded:Wait()
-			local tool
-	
-			for _, v in player:GetDescendants() do
-				if v.Name == "SyncAPI" then
-					tool = v.Parent
-				end
-			end
-			for _, v in game.ReplicatedStorage:GetDescendants() do
-				if v.Name == "SyncAPI" then
-					tool = v.Parent
-				end
-			end
-	
-			if not tool then return end
-			local remote = tool.SyncAPI.ServerEndpoint
-	
-			local function _(args)
-				remote:InvokeServer(unpack(args))
-			end
-	
-			local function DestroyExistingMesh(part)
-				local mesh = part:FindFirstChildOfClass("SpecialMesh")
-				if mesh then
-					local args = {
-						"Remove",
-						{ mesh }
-					}
-					_(args)
-				end
-			end
-	
-			local function ForceSpecialMesh(part)
-				for _, m in ipairs(part:GetChildren()) do
-					if m:IsA("SpecialMesh") or m:IsA("BlockMesh") or m:IsA("CylinderMesh") then
-						DestroyExistingMesh(part)
-					end
-				end
-	
-				local args = {
-					"CreateMeshes",
-					{
-						{
-							Part = part
-						}
-					}
-				}
-				_(args)
-			end
-	
-			function SetMeshType(part, mesh)
-				local args = {
-					"SyncMesh",
-					{
-						{
-							Part = part,
-							MeshType = mesh
-						}
-					}
-				}
-				_(args)
-			end
-	
-			function Color(part,color)
-				local args = {
-					"SyncColor",
-					{
-						{
-							Part = part,
-							Color = color,
-							UnionColoring = false
-						}
-					}
-				}
-				_(args)
-			end
-	
-	
-			local parts = {}
-	
-			for _, v in ipairs(char:GetChildren()) do
-				if v:IsA("BasePart") and v.Name ~= "HumanoidRootPart" then
-					table.insert(parts, v)
-				end
-			end
-	
-	
-			local meshTypes = {
-				"Brick",
-				"Cylinder",
-				"Head",
-				"Sphere",
-				"Torso",
-				"Wedge"
-			}
-	
-			for _, part in ipairs(parts) do
-				ForceSpecialMesh(part)
-			end
-	
-			task.wait()
-	
-			task.spawn(function()
-				while true do
-					task.wait()
-	
-					for _, part in ipairs(parts) do
-						local m = meshTypes[math.random(1, #meshTypes)]
-						SetMeshType(part, m)
-						Color(part,Color3.new(
-							math.random(),
-							math.random(),
-							math.random()
-							))
-					end
-				end
-			end)
-		end)
-	end
-end)
+    local script = LMG2L["LocalScript_1a"];
+    script.parent.MouseButton1Down:Connect(function()
+        local player = game.Players.LocalPlayer
+        local char = player.Character or player.CharacterAdded:Wait()
+        local tool
+        for _, v in player:GetDescendants() do
+            if v.Name == "SyncAPI" then tool = v.Parent end
+        end
+        for _, v in game.ReplicatedStorage:GetDescendants() do
+            if v.Name == "SyncAPI" then tool = v.Parent end
+        end
+        if not tool then return end
+        local remote = tool.SyncAPI.ServerEndpoint
+        local function _(args) remote:InvokeServer(unpack(args)) end
+        
+        local function DestroyExistingMesh(part)
+            local mesh = part:FindFirstChildOfClass("SpecialMesh")
+            if mesh then
+                local args = { "Remove", { mesh } }
+                _(args)
+            end
+        end
+
+        local function ForceSpecialMesh(part)
+            for _, m in ipairs(part:GetChildren()) do
+                if m:IsA("SpecialMesh") or m:IsA("BlockMesh") or m:IsA("CylinderMesh") then
+                    DestroyExistingMesh(part)
+                end
+            end
+            local args = { "CreateMeshes", { { Part = part } } }
+            _(args)
+        end
+
+        function SetMeshType(part, mesh)
+            local args = { "SyncMesh", { { Part = part, MeshType = mesh } } }
+            _(args)
+        end
+
+        function Color(part,color)
+            local args = { "SyncColor", { { Part = part, Color = color, UnionColoring = false } } }
+            _(args)
+        end
+
+        local parts = {}
+        for _, v in ipairs(char:GetChildren()) do
+            if v:IsA("BasePart") and v.Name ~= "HumanoidRootPart" then
+                table.insert(parts, v)
+            end
+        end
+
+        local meshTypes = { "Brick", "Cylinder", "Head", "Sphere", "Torso", "Wedge" }
+        for _, part in ipairs(parts) do
+            ForceSpecialMesh(part)
+        end
+
+        task.wait()
+        task.spawn(function()
+            while true do
+                task.wait()
+                for _, part in ipairs(parts) do
+                    local m = meshTypes[math.random(1, #meshTypes)]
+                    SetMeshType(part, m)
+                    Color(part, Color3.new(math.random(), math.random(), math.random()))
+                end
+            end
+        end)
+    end)
 end;
 task.spawn(C_1a);
 -- Players.9x7x9x4x6.PlayerGui.ScreenGui.Frame.TextButton.LocalScript
