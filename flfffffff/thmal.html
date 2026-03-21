@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stegano Tool - Hidden 70</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; background: #f4f4f9; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 500px; width: 100%; }
+        input, button { width: 100%; margin: 10px 0; padding: 10px; border-radius: 5px; border: 1px solid #ccc; }
+        button { background: #2563eb; color: white; cursor: pointer; border: none; font-weight: bold; }
+        button:hover { background: #1d4ed8; }
+        canvas { display: none; }
+        #preview { width: 100%; margin-top: 10px; border-radius: 5px; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Invisible Message Inserter</h2>
+    <p>Masukkan foto untuk menyisipkan tanda rahasia "70".</p>
+    
+    <input type="file" id="upload" accept="image/*">
+    <button id="processBtn">Proses & Sisipkan "70"</button>
+    
+    <img id="preview" alt="Preview">
+    <a id="downloadBtn" style="display:none;"><button style="background: #059669;">Download Hasil</button></a>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script>
+    const upload = document.getElementById('upload');
+    const processBtn = document.getElementById('processBtn');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const preview = document.getElementById('preview');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    processBtn.addEventListener('click', () => {
+        if (!upload.files[0]) return alert('Pilih foto dulu!');
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imageData.data;
+
+                const secretMessage = "HIDDEN-70";
+                for (let i = 0; i < secretMessage.length; i++) {
+                    const charCode = secretMessage.charCodeAt(i);
+                    data[i * 4] = (data[i * 4] & 0xFE) | (charCode % 2); 
+                }
+
+                ctx.putImageData(imageData, 0, 0);
+                
+                const dataUrl = canvas.toDataURL('image/png');
+                preview.src = dataUrl;
+                preview.style.display = 'block';
+                downloadBtn.href = dataUrl;
+                downloadBtn.download = 'hidden_70_image.png';
+                downloadBtn.style.display = 'block';
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(upload.files[0]);
+    });
+</script>
+
+</body>
+</html>
