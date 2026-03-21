@@ -3,22 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Full Size Image Watermark Trick</title>
+    <title>Visible Full Size Watermark</title>
     <style>
-        body { font-family: 'Segoe UI', system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; background: #eef2f5; color: #333; }
-        .wrapper { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.07); max-width: 600px; width: 100%; text-align: center; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; background: #f0f4f8; color: #333; }
+        .wrapper { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 600px; width: 100%; text-align: center; }
         .inp-group { text-align: left; margin-bottom: 15px; }
         label { display: block; font-weight: 600; margin-bottom: 8px; color: #555; }
-        input[type="file"] { width: 100%; padding: 10px; border: 2px dashed #ddd; border-radius: 10px; box-sizing: border-box; background: #fafafa; }
-        input[type="file"]:hover { border-color: #3b82f6; background: #f0f7ff; }
+        input[type="file"] { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; background: #fff; }
+        input[type="file"]:hover { border-color: #3b82f6; }
         button#btnRun { background: #2563eb; color: white; padding: 15px; border: none; border-radius: 10px; cursor: pointer; width: 100%; font-size: 16px; font-weight: bold; margin-top: 10px; transition: 0.2s; }
         button#btnRun:hover { background: #1d4ed8; }
-        #finalResult { margin-top: 30px; display: none; border-top: 2px solid #f0f0f0; padding-top: 20px; }
-        .view-grid { display: flex; gap: 15px; margin-top: 15px; flex-wrap: wrap; }
-        .view-box { flex: 1; min-width: 250px; padding: 10px; border-radius: 12px; text-align: center; }
-        .bg-dark { background: #000; color: #fff; }
-        .bg-light { background: #fff; color: #000; border: 1px solid #e0e0e0; }
-        img { max-width: 100%; height: auto; border-radius: 8px; margin-top: 10px; }
+        #finalResult { margin-top: 30px; display: none; border-top: 2px solid #eee; padding-top: 20px; }
+        .preview-container { background: #fafafa; padding: 10px; border-radius: 12px; border: 1px solid #e0e0e0; text-align: center; margin-top: 15px; }
+        img#outImg { max-width: 100%; height: auto; border-radius: 8px; }
         canvas { display: none; }
         .dl-button { background: #10b981; margin-top: 20px; display: inline-block; text-decoration: none; border-radius: 10px; width: auto; padding: 12px 30px; color: white; font-weight: bold; }
         .dl-button:hover { background: #059669; }
@@ -27,8 +24,8 @@
 <body>
 
 <div class="wrapper">
-    <h2>Full Size Watermark</h2>
-    <p>Pilih foto utama dan gambar watermark (PNG transparan).</p>
+    <h2>Full Size Watermark (Visible)</h2>
+    <p>Gunakan gambar asli watermark tanpa mengubahnya menjadi putih.</p>
     
     <div class="inp-group">
         <label>1. Pilih Foto Utama:</label>
@@ -36,23 +33,16 @@
     </div>
 
     <div class="inp-group">
-        <label>2. Pilih Gambar Watermark (Sama Size):</label>
+        <label>2. Pilih Gambar Watermark (Gunakan PNG Transparan):</label>
         <input type="file" id="photoWatermark" accept="image/*">
     </div>
     
     <button id="btnRun">Proses Gambar</button>
 
     <div id="finalResult">
-        <p><strong>Preview Simulasi Latar:</strong></p>
-        <div class="view-grid">
-            <div class="view-box bg-light">
-                <small>Latar Putih (Watermark Hilang)</small><br>
-                <img id="outWhite">
-            </div>
-            <div class="view-box bg-dark">
-                <small>Latar Hitam (Watermark Muncul)</small><br>
-                <img id="outBlack">
-            </div>
+        <p><strong>Preview Hasil:</strong></p>
+        <div class="preview-container">
+            <img id="outImg">
         </div>
         <a id="lnkDl"><button class="dl-button">Download Hasil PNG</button></a>
     </div>
@@ -66,8 +56,7 @@
     const btnRun = document.getElementById('btnRun');
     const canvas = document.getElementById('cvsWorking');
     const ctx = canvas.getContext('2d');
-    const outWhite = document.getElementById('outWhite');
-    const outBlack = document.getElementById('outBlack');
+    const outImg = document.getElementById('outImg');
     const finalResult = document.getElementById('finalResult');
     const lnkDl = document.getElementById('lnkDl');
 
@@ -92,31 +81,19 @@
 
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                        ctx.globalAlpha = 0.3;
+                        ctx.globalAlpha = 1.0;
                         ctx.drawImage(imgM, 0, 0);
 
-                        ctx.globalAlpha = 0.9;
+                        ctx.globalAlpha = 0.5;
                         
-                        const tempCvs = document.createElement('canvas');
-                        const tempCtx = tempCvs.getContext('2d');
-                        tempCvs.width = canvas.width;
-                        tempCvs.height = canvas.height;
-                        
-                        tempCtx.drawImage(imgW, 0, 0, canvas.width, canvas.height);
-                        
-                        tempCtx.globalCompositeOperation = 'source-in';
-                        tempCtx.fillStyle = 'white';
-                        tempCtx.fillRect(0, 0, tempCvs.width, tempCvs.height);
-                        
-                        ctx.drawImage(tempCvs, 0, 0);
+                        ctx.drawImage(imgW, 0, 0, canvas.width, canvas.height);
 
                         ctx.globalAlpha = 1.0;
 
                         const dataUrl = canvas.toDataURL('image/png');
-                        outWhite.src = dataUrl;
-                        outBlack.src = dataUrl;
+                        outImg.src = dataUrl;
                         lnkDl.href = dataUrl;
-                        lnkDl.download = "full_size_watermark_trick.png";
+                        lnkDl.download = "hasil_watermark_visible.png";
                         finalResult.style.display = 'block';
                     };
                     imgW.src = eW.target.result;
