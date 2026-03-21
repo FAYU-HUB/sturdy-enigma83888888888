@@ -3,37 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transparent 70 Watermark</title>
+    <title>Watermark 0.3 Transparency</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 40px; background: #eceff1; }
-        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 600px; width: 100%; text-align: center; }
-        input[type="file"] { margin: 20px 0; }
-        .controls { margin-bottom: 20px; }
-        button { background: #4f46e5; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        button:hover { background: #4338ca; }
-        #previewContainer { margin-top: 20px; border: 2px dashed #ccc; padding: 10px; border-radius: 10px; display: none; }
-        img { max-width: 100%; height: auto; border-radius: 8px; }
+        body { font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 30px; background: #f0f2f5; }
+        .box { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; }
+        input[type="file"] { margin: 15px 0; display: block; width: 100%; }
+        button { background: #2563eb; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; width: 100%; font-size: 16px; margin-top: 10px; }
+        button:hover { background: #1d4ed8; }
+        #resultArea { margin-top: 20px; display: none; }
+        img { max-width: 100%; border-radius: 8px; border: 1px solid #ddd; }
         canvas { display: none; }
+        .download-btn { background: #059669; margin-top: 15px; text-decoration: none; display: inline-block; width: 92%; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Watermark 70 Transparan</h2>
-    <p>Upload foto untuk memberi angka 70 yang samar.</p>
+<div class="box">
+    <h3>Watermark 70 (Opacity 0.3)</h3>
+    <p>Pilih foto, lalu klik proses untuk menempelkan angka 70 yang transparan.</p>
     
     <input type="file" id="imageInput" accept="image/*">
-    
-    <div class="controls">
-        <button id="btnProses">Proses Gambar</button>
-    </div>
+    <button id="processBtn">Proses & Tempel "70"</button>
 
-    <div id="previewContainer">
-        <h3>Hasil:</h3>
-        <img id="resultImage">
-        <br><br>
-        <a id="downloadLink"><button style="background: #10b981;">Download Foto</button></a>
+    <div id="resultArea">
+        <p>Preview Hasil:</p>
+        <img id="outputImage">
+        <a id="downloadLink"><button class="download-btn">Download Gambar</button></a>
     </div>
+</div>
+
+<canvas id="workingCanvas"></canvas>
+
+<script>
+    const imageInput = document.getElementById('imageInput');
+    const processBtn = document.getElementById('processBtn');
+    const canvas = document.getElementById('workingCanvas');
+    const ctx = canvas.getContext('2d');
+    const outputImage = document.getElementById('outputImage');
+    const resultArea = document.getElementById('resultArea');
+    const downloadLink = document.getElementById('downloadLink');
+
+    processBtn.addEventListener('click', () => {
+        if (!imageInput.files[0]) {
+            alert('Pilih foto terlebih dahulu!');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+
+                ctx.drawImage(img, 0, 0);
+
+                const size = Math.min(canvas.width, canvas.height) * 0.4;
+                ctx.font = `bold ${size}px Arial`;
+                
+                ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+
+                ctx.fillText("70", canvas.width / 2, canvas.height / 2);
+
+                const dataUrl = canvas.toDataURL('image/png');
+                outputImage.src = dataUrl;
+                downloadLink.href = dataUrl;
+                downloadLink.download = "hasil_70_transparan.png";
+                
+                resultArea.style.display = 'block';
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(imageInput.files[0]);
+    });
+</script>
+
+</body>
+</html>
 </div>
 
 <canvas id="mainCanvas"></canvas>
