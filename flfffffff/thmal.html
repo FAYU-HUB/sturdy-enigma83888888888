@@ -58,14 +58,14 @@
 
                 ctx.clearRect(0, 0, cvs.width, cvs.height);
 
-                ctx.globalAlpha = 0.3;
+                ctx.globalAlpha = 0.1;
                 
                 ctx.drawImage(img, 0, 0);
 
                 const dataUrl = cvs.toDataURL('image/png');
                 outImg.src = dataUrl;
                 dlLink.href = dataUrl;
-                dlLink.download = "gambar_transparan_03.png";
+                dlLink.download = "no_ez.png";
                 
                 resultContainer.style.display = 'block';
             };
