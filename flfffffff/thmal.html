@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Watermark Trick Tool</title>
+    <title>Full Size Image Watermark Trick</title>
     <style>
         body { font-family: 'Segoe UI', system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; background: #eef2f5; color: #333; }
         .wrapper { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.07); max-width: 600px; width: 100%; text-align: center; }
@@ -27,30 +27,30 @@
 <body>
 
 <div class="wrapper">
-    <h2>Image Watermark Trick</h2>
-    <p>Upload dua gambar. Watermark muncul di hitam, hilang di putih.</p>
+    <h2>Full Size Watermark</h2>
+    <p>Pilih foto utama dan gambar watermark (PNG transparan).</p>
     
     <div class="inp-group">
-        <label>1. Pilih Foto Utama Anda:</label>
+        <label>1. Pilih Foto Utama:</label>
         <input type="file" id="photoMain" accept="image/*">
     </div>
 
     <div class="inp-group">
-        <label>2. Pilih Gambar Watermark (Gunakan PNG Transparan):</label>
+        <label>2. Pilih Gambar Watermark (Sama Size):</label>
         <input type="file" id="photoWatermark" accept="image/*">
     </div>
     
-    <button id="btnRun">Buat Ilusi Gambar</button>
+    <button id="btnRun">Proses Gambar</button>
 
     <div id="finalResult">
         <p><strong>Preview Simulasi Latar:</strong></p>
         <div class="view-grid">
             <div class="view-box bg-light">
-                <small>Tampilan di Latar Putih</small><br>
+                <small>Latar Putih (Watermark Hilang)</small><br>
                 <img id="outWhite">
             </div>
             <div class="view-box bg-dark">
-                <small>Tampilan di Latar Hitam</small><br>
+                <small>Latar Hitam (Watermark Muncul)</small><br>
                 <img id="outBlack">
             </div>
         </div>
@@ -73,7 +73,7 @@
 
     btnRun.addEventListener('click', () => {
         if (!photoMain.files[0] || !photoWatermark.files[0]) {
-            alert('Harap masukkan kedua gambar terlebih dahulu!');
+            alert('Harap masukkan kedua gambar!');
             return;
         }
 
@@ -99,22 +99,16 @@
                         
                         const tempCvs = document.createElement('canvas');
                         const tempCtx = tempCvs.getContext('2d');
-                        tempCvs.width = imgW.width;
-                        tempCvs.height = imgW.height;
+                        tempCvs.width = canvas.width;
+                        tempCvs.height = canvas.height;
                         
-                        tempCtx.drawImage(imgW, 0, 0);
+                        tempCtx.drawImage(imgW, 0, 0, canvas.width, canvas.height);
                         
                         tempCtx.globalCompositeOperation = 'source-in';
                         tempCtx.fillStyle = 'white';
                         tempCtx.fillRect(0, 0, tempCvs.width, tempCvs.height);
-
-                        const wtmSize = Math.min(canvas.width, canvas.height) * 0.4;
-                        const w = wtmSize;
-                        const h = (imgW.height / imgW.width) * wtmSize;
-                        const x = (canvas.width / 2) - (w / 2);
-                        const y = (canvas.height / 2) - (h / 2);
                         
-                        ctx.drawImage(tempCvs, x, y, w, h);
+                        ctx.drawImage(tempCvs, 0, 0);
 
                         ctx.globalAlpha = 1.0;
 
@@ -122,7 +116,7 @@
                         outWhite.src = dataUrl;
                         outBlack.src = dataUrl;
                         lnkDl.href = dataUrl;
-                        lnkDl.download = "illusive_image_watermark.png";
+                        lnkDl.download = "full_size_watermark_trick.png";
                         finalResult.style.display = 'block';
                     };
                     imgW.src = eW.target.result;
