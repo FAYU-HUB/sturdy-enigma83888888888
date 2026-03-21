@@ -3,75 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transparansi Gambar 0.3</title>
+    <title>Image Watermark Trick Tool</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 40px; background: #fdfdfd; }
-        .box { background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); max-width: 500px; width: 100%; text-align: center; border: 1px solid #eee; }
-        input[type="file"] { margin: 20px 0; width: 100%; }
-        button { background: #333; color: white; padding: 12px; border: none; border-radius: 6px; cursor: pointer; width: 100%; font-size: 16px; }
-        button:hover { background: #000; }
-        #resultContainer { margin-top: 25px; display: none; }
-        img { max-width: 100%; border-radius: 8px; background: url('https://www.transparenttextures.com/patterns/checkerboard.png'); }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; background: #eef2f5; color: #333; }
+        .wrapper { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.07); max-width: 600px; width: 100%; text-align: center; }
+        .inp-group { text-align: left; margin-bottom: 15px; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; color: #555; }
+        input[type="file"] { width: 100%; padding: 10px; border: 2px dashed #ddd; border-radius: 10px; box-sizing: border-box; background: #fafafa; }
+        input[type="file"]:hover { border-color: #3b82f6; background: #f0f7ff; }
+        button#btnRun { background: #2563eb; color: white; padding: 15px; border: none; border-radius: 10px; cursor: pointer; width: 100%; font-size: 16px; font-weight: bold; margin-top: 10px; transition: 0.2s; }
+        button#btnRun:hover { background: #1d4ed8; }
+        #finalResult { margin-top: 30px; display: none; border-top: 2px solid #f0f0f0; padding-top: 20px; }
+        .view-grid { display: flex; gap: 15px; margin-top: 15px; flex-wrap: wrap; }
+        .view-box { flex: 1; min-width: 250px; padding: 10px; border-radius: 12px; text-align: center; }
+        .bg-dark { background: #000; color: #fff; }
+        .bg-light { background: #fff; color: #000; border: 1px solid #e0e0e0; }
+        img { max-width: 100%; height: auto; border-radius: 8px; margin-top: 10px; }
         canvas { display: none; }
-        .dl-btn { background: #2563eb; margin-top: 15px; text-decoration: none; display: inline-block; padding: 10px 20px; color: white; border-radius: 6px; width: 92%; }
+        .dl-button { background: #10b981; margin-top: 20px; display: inline-block; text-decoration: none; border-radius: 10px; width: auto; padding: 12px 30px; color: white; font-weight: bold; }
+        .dl-button:hover { background: #059669; }
     </style>
 </head>
 <body>
 
-<div class="box">
-    <h2>Ubah Transparansi Gambar</h2>
-    <p>Masukkan foto untuk diubah menjadi transparansi 0.3</p>
+<div class="wrapper">
+    <h2>Image Watermark Trick</h2>
+    <p>Upload dua gambar. Watermark muncul di hitam, hilang di putih.</p>
     
-    <input type="file" id="imgFile" accept="image/*">
-    <button id="process">Proses Sekarang</button>
+    <div class="inp-group">
+        <label>1. Pilih Foto Utama Anda:</label>
+        <input type="file" id="photoMain" accept="image/*">
+    </div>
 
-    <div id="resultContainer">
-        <p>Preview (Latar Belakang Kotak-kotak Menunjukkan Transparansi):</p>
-        <img id="outImg">
-        <a id="dlLink" class="dl-btn">Download Gambar Transparan</a>
+    <div class="inp-group">
+        <label>2. Pilih Gambar Watermark (Gunakan PNG Transparan):</label>
+        <input type="file" id="photoWatermark" accept="image/*">
+    </div>
+    
+    <button id="btnRun">Buat Ilusi Gambar</button>
+
+    <div id="finalResult">
+        <p><strong>Preview Simulasi Latar:</strong></p>
+        <div class="view-grid">
+            <div class="view-box bg-light">
+                <small>Tampilan di Latar Putih</small><br>
+                <img id="outWhite">
+            </div>
+            <div class="view-box bg-dark">
+                <small>Tampilan di Latar Hitam</small><br>
+                <img id="outBlack">
+            </div>
+        </div>
+        <a id="lnkDl"><button class="dl-button">Download Hasil PNG</button></a>
     </div>
 </div>
 
-<canvas id="cvs"></canvas>
+<canvas id="cvsWorking"></canvas>
 
 <script>
-    const imgFile = document.getElementById('imgFile');
-    const process = document.getElementById('process');
-    const cvs = document.getElementById('cvs');
-    const ctx = cvs.getContext('2d');
-    const outImg = document.getElementById('outImg');
-    const resultContainer = document.getElementById('resultContainer');
-    const dlLink = document.getElementById('dlLink');
+    const photoMain = document.getElementById('photoMain');
+    const photoWatermark = document.getElementById('photoWatermark');
+    const btnRun = document.getElementById('btnRun');
+    const canvas = document.getElementById('cvsWorking');
+    const ctx = canvas.getContext('2d');
+    const outWhite = document.getElementById('outWhite');
+    const outBlack = document.getElementById('outBlack');
+    const finalResult = document.getElementById('finalResult');
+    const lnkDl = document.getElementById('lnkDl');
 
-    process.addEventListener('click', () => {
-        if (!imgFile.files[0]) {
-            alert('Silakan pilih foto!');
+    btnRun.addEventListener('click', () => {
+        if (!photoMain.files[0] || !photoWatermark.files[0]) {
+            alert('Harap masukkan kedua gambar terlebih dahulu!');
             return;
         }
 
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-                cvs.width = img.width;
-                cvs.height = img.height;
+        const readMain = new FileReader();
+        const readWtm = new FileReader();
 
-                ctx.clearRect(0, 0, cvs.width, cvs.height);
-
-                ctx.globalAlpha = 0.1;
+        readMain.onload = (eM) => {
+            const imgM = new Image();
+            imgM.onload = () => {
                 
-                ctx.drawImage(img, 0, 0);
+                readWtm.onload = (eW) => {
+                    const imgW = new Image();
+                    imgW.onload = () => {
+                        canvas.width = imgM.width;
+                        canvas.height = imgM.height;
 
-                const dataUrl = cvs.toDataURL('image/png');
-                outImg.src = dataUrl;
-                dlLink.href = dataUrl;
-                dlLink.download = "no_ez.png";
-                
-                resultContainer.style.display = 'block';
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                        ctx.globalAlpha = 0.3;
+                        ctx.drawImage(imgM, 0, 0);
+
+                        ctx.globalAlpha = 0.9;
+                        
+                        const tempCvs = document.createElement('canvas');
+                        const tempCtx = tempCvs.getContext('2d');
+                        tempCvs.width = imgW.width;
+                        tempCvs.height = imgW.height;
+                        
+                        tempCtx.drawImage(imgW, 0, 0);
+                        
+                        tempCtx.globalCompositeOperation = 'source-in';
+                        tempCtx.fillStyle = 'white';
+                        tempCtx.fillRect(0, 0, tempCvs.width, tempCvs.height);
+
+                        const wtmSize = Math.min(canvas.width, canvas.height) * 0.4;
+                        const w = wtmSize;
+                        const h = (imgW.height / imgW.width) * wtmSize;
+                        const x = (canvas.width / 2) - (w / 2);
+                        const y = (canvas.height / 2) - (h / 2);
+                        
+                        ctx.drawImage(tempCvs, x, y, w, h);
+
+                        ctx.globalAlpha = 1.0;
+
+                        const dataUrl = canvas.toDataURL('image/png');
+                        outWhite.src = dataUrl;
+                        outBlack.src = dataUrl;
+                        lnkDl.href = dataUrl;
+                        lnkDl.download = "illusive_image_watermark.png";
+                        finalResult.style.display = 'block';
+                    };
+                    imgW.src = eW.target.result;
+                };
+                readWtm.readAsDataURL(photoWatermark.files[0]);
             };
-            img.src = e.target.result;
+            imgM.src = eM.target.result;
         };
-        reader.readAsDataURL(imgFile.files[0]);
+        readMain.readAsDataURL(photoMain.files[0]);
     });
 </script>
 
