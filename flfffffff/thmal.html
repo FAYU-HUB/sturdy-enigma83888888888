@@ -3,80 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Watermark 0.3 Transparency</title>
+    <title>Image Watermark Overlay (0.3 Transparency)</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 30px; background: #f0f2f5; }
-        .box { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; }
-        input[type="file"] { margin: 15px 0; display: block; width: 100%; }
-        button { background: #2563eb; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; width: 100%; font-size: 16px; margin-top: 10px; }
-        button:hover { background: #1d4ed8; }
-        #resultArea { margin-top: 20px; display: none; }
-        img { max-width: 100%; border-radius: 8px; border: 1px solid #ddd; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 40px; background: #e0f2f1; }
+        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 600px; width: 100%; text-align: center; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #00796b; }
+        input[type="file"] { width: 100%; padding: 8px; border: 1px solid #b2dfdb; border-radius: 5px; background: #f1f8f9; }
+        button { background: #00897b; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; width: 100%; transition: background 0.3s; }
+        button:hover { background: #00695c; }
+        #previewContainer { margin-top: 30px; border-top: 2px solid #b2dfdb; padding-top: 20px; display: none; }
+        img { max-width: 100%; height: auto; border-radius: 10px; border: 2px solid #ddd; }
         canvas { display: none; }
-        .download-btn { background: #059669; margin-top: 15px; text-decoration: none; display: inline-block; width: 92%; }
+        .download-btn { background: #ff6f00; margin-top: 20px; display: inline-block; text-decoration: none; width: auto; padding: 10px 30px; border-radius: 30px; color: white; }
+        .download-btn:hover { background: #e65100; }
     </style>
 </head>
 <body>
 
-<div class="box">
-    <h3>Watermark 70 (Opacity 0.3)</h3>
-    <p>Pilih foto, lalu klik proses untuk menempelkan angka 70 yang transparan.</p>
+<div class="container">
+    <h2>Tempel Gambar (Watermark) 0.3</h2>
+    <p>Upload foto utama dan foto angka '70' Anda.</p>
     
-    <input type="file" id="imageInput" accept="image/*">
-    <button id="processBtn">Proses & Tempel "70"</button>
+    <div class="input-group">
+        <label>1. Pilih Foto Utama:</label>
+        <input type="file" id="mainImageInput" accept="image/*">
+    </div>
 
-    <div id="resultArea">
-        <p>Preview Hasil:</p>
-        <img id="outputImage">
-        <a id="downloadLink"><button class="download-btn">Download Gambar</button></a>
+    <div class="input-group">
+        <label>2. Pilih Foto "70" (Overlay):</label>
+        <input type="file" id="overlayImageInput" accept="image/*">
+    </div>
+    
+    <button id="btnProses">Proses Gambar</button>
+
+    <div id="previewContainer">
+        <h3>Preview Hasil:</h3>
+        <img id="resultImage">
+        <br>
+        <a id="downloadLink" class="download-btn">Download Hasil PNG</a>
     </div>
 </div>
 
-<canvas id="workingCanvas"></canvas>
+<canvas id="mainCanvas"></canvas>
 
 <script>
-    const imageInput = document.getElementById('imageInput');
-    const processBtn = document.getElementById('processBtn');
-    const canvas = document.getElementById('workingCanvas');
+    const mainImageInput = document.getElementById('mainImageInput');
+    const overlayImageInput = document.getElementById('overlayImageInput');
+    const btnProses = document.getElementById('btnProses');
+    const canvas = document.getElementById('mainCanvas');
     const ctx = canvas.getContext('2d');
-    const outputImage = document.getElementById('outputImage');
-    const resultArea = document.getElementById('resultArea');
+    const resultImage = document.getElementById('resultImage');
+    const previewContainer = document.getElementById('previewContainer');
     const downloadLink = document.getElementById('downloadLink');
 
-    processBtn.addEventListener('click', () => {
-        if (!imageInput.files[0]) {
-            alert('Pilih foto terlebih dahulu!');
+    btnProses.addEventListener('click', () => {
+        if (!mainImageInput.files[0] || !overlayImageInput.files[0]) {
+            alert('Harap pilih KEDUA gambar (foto utama & foto 70)!');
             return;
         }
 
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-                canvas.width = img.width;
-                canvas.height = img.height;
+        const readMain = new FileReader();
+        const readOverlay = new FileReader();
 
-                ctx.drawImage(img, 0, 0);
-
-                const size = Math.min(canvas.width, canvas.height) * 0.4;
-                ctx.font = `bold ${size}px Arial`;
+        readMain.onload = function(eMain) {
+            const imgMain = new Image();
+            imgMain.onload = function() {
                 
-                ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
+                readOverlay.onload = function(eOverlay) {
+                    const imgOverlay = new Image();
+                    imgOverlay.onload = function() {
+                        canvas.width = imgMain.width;
+                        canvas.height = imgMain.height;
 
-                ctx.fillText("70", canvas.width / 2, canvas.height / 2);
+                        ctx.drawImage(imgMain, 0, 0);
 
-                const dataUrl = canvas.toDataURL('image/png');
-                outputImage.src = dataUrl;
-                downloadLink.href = dataUrl;
-                downloadLink.download = "hasil_70_transparan.png";
-                
-                resultArea.style.display = 'block';
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(imageInput.files[0]);
+                        ctx.globalAlpha = 0.3;
+
+                        const ovSize = Math.min(canvas.width, canvas.height) * 0.5;
+                        const ovWidth = ovSize;
+                        const ovHeight = (imgOverlay.height / imgOverlay.width) * ovSize;
+
+                        ctx.drawImage(imgOverlay, (canvas.width / 2) - (ovWidth / 2), (canvas.height / 2) - (ovHeight / 2), ovWidth, ovHeight);
+                        
+                        ctx.globalAlpha = 1.0;
+
+                        const finalDataUrl = canvas.toDataURL('image/png');
+                        resultImage.src = finalDataUrl;
+                        downloadLink.href = finalDataUrl;
+                        downloadLink.download = "foto_gabungan_03.png";
+                        
+                        previewContainer.style.display = 'block';
+                    }
+                    imgOverlay.src = eOverlay.target.result;
+                }
+                readOverlay.readAsDataURL(overlayImageInput.files[0]);
+            }
+            imgMain.src = eMain.target.result;
+        }
+        readMain.readAsDataURL(mainImageInput.files[0]);
     });
 </script>
 
